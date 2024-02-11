@@ -15,17 +15,12 @@ function isNotOutOFBounds(tile) {
   }
   return true;
 }
-function createGraph() {
-  const xAxis = [...Array(8).keys()].map(Number);
-  const yAxis = [...Array(8).keys()].map(Number);
-}
-
-function possibleMoves(tile) {
+function getPossibleMovesFrom(tile) {
   const moves = [];
   // Negative x move
-  for (let x = -1; x > -2; x -= 1) {
-    for (let y = 2; y > -2; y -= 1) {
-      if (y === 0) {
+  for (let x = -1; x >= -2; x -= 1) {
+    for (let y = 2; y >= -2; y -= 1) {
+      if (y === 0 || Math.abs(Math.abs(x) - Math.abs(y)) !== 1) {
         continue;
       }
       const possibleTile = [tile[0] + x, tile[1] + y];
@@ -36,9 +31,9 @@ function possibleMoves(tile) {
   }
 
   // Positive x move
-  for (let x = 1; x < 2; x += 1) {
-    for (let y = 2; y > -2; y -= 1) {
-      if (y === 0) {
+  for (let x = 1; x <= 2; x += 1) {
+    for (let y = 2; y >= -2; y -= 1) {
+      if (y === 0 || Math.abs(Math.abs(x) - Math.abs(y)) !== 1) {
         continue;
       }
       const possibleTile = [tile[0] + x, tile[1] + y];
@@ -49,6 +44,11 @@ function possibleMoves(tile) {
   }
 
   return moves;
+}
+
+function createGraph() {
+  const xAxis = [...Array(8).keys()].map(Number);
+  const yAxis = [...Array(8).keys()].map(Number);
 }
 
 function knightMoves(origin, destination) {
@@ -63,6 +63,7 @@ const start = [3, 3];
 const end = [3, 4];
 
 createGraph();
-possibleMoves([3, 3]);
+getPossibleMovesFrom([3, 3]);
+getPossibleMovesFrom([0, 0]);
 
 const shortestPath = knightMoves(start, end);
