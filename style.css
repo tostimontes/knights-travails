@@ -1,0 +1,48 @@
+#chessboard {
+    display: grid;
+    grid-template-columns: 30px repeat(8, 1fr); /* 1 column for row labels + 8 columns for tiles */
+    grid-template-rows: 30px repeat(8, 1fr); /* 1 row for column labels + 8 rows for tiles */
+    gap: 0;
+    width: 500px; /* or any size you prefer */
+    height: 500px; /* should be same as width for square tiles */
+}
+
+.labels {
+    display: contents; /* To align labels with the grid */
+}
+
+.label {
+    font-size: 20px; /* Adjust label size as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row {
+    display: contents; /* To align tiles with the grid */
+}
+
+.tile {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Using wood-like colors for the tiles */
+.row:nth-child(odd) .tile:nth-child(odd),
+.row:nth-child(even) .tile:nth-child(even) {
+    background-color: #deb887; /* Lighter wood tone */
+}
+
+.row:nth-child(odd) .tile:nth-child(even),
+.row:nth-child(even) .tile:nth-child(odd) {
+    background-color: #a0522d; /* Darker wood tone */
+}
+
+/*
+#message {
+    margin-top: 20px;
+    font-size: 1.2em;
+}
