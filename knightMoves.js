@@ -47,13 +47,32 @@ function getPossibleMovesFrom(tile) {
 }
 
 function createGraph() {
-  const xAxis = [...Array(8).keys()].map(Number);
-  const yAxis = [...Array(8).keys()].map(Number);
+  let board = [...Array(64).keys()];
+  board = board.map((number, index) => {
+    const xCoordinate = number % 8;
+    const yCoordinate = Math.floor(number / 8);
+    board[index] = [xCoordinate, yCoordinate];
+    return board[index];
+  });
+  const graph = [];
+
+  for (let i = 0; i < board.length; i++) {
+    const vertex = {};
+    vertex.tile = board[i];
+    vertex.moves = getPossibleMovesFrom(board[i]);
+    graph.push(vertex);
+  }
+
+  return graph;
 }
 
 function knightMoves(origin, destination) {
   const output = [origin];
   const checkedMoves = [];
+
+  function checkShortest(start, end) {
+    
+  }
 
   output.push(destination);
   return output;
@@ -62,8 +81,6 @@ function knightMoves(origin, destination) {
 const start = [3, 3];
 const end = [3, 4];
 
-createGraph();
-getPossibleMovesFrom([3, 3]);
-getPossibleMovesFrom([0, 0]);
+const graph = createGraph();
 
 const shortestPath = knightMoves(start, end);
