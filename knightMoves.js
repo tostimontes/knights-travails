@@ -1,12 +1,3 @@
-// * Data Structures
-// Use undirected unweighted graph (or weighted?)
-// ! graph where each vertex is a tile, and has edges that strecth towards the other vertices?
-// * Algorithm instructions
-// Pacman style. Call a function possiblePathsFromTile(tile) that return an array of all the tiles (max 8)
-// ! Use memoization to record possible moves in each call, and check if any move (or the inverse, has already been discovered)
-// check if one of the tiles is origin
-// if not, call function on all tiles
-// exit loop/recursion when one of the result tiles === origin
 // * Extra credit: create UI representation with animated horse, so that anyone can click in two tiles to know the shortest path
 
 function isNotOutOFBounds(tile) {
@@ -45,15 +36,15 @@ function getPossibleMovesFrom(tile) {
 
   return moves;
 }
-
+function getNumberFromTile(tile) {
+  return tile[0] + tile[1] * 8;
+}
+function getTileFromNumber(number) {
+  return [number % 8, Math.floor(number / 8)];
+}
 function createGraph() {
   let board = [...Array(64).keys()];
-  board = board.map((number, index) => {
-    const xCoordinate = number % 8;
-    const yCoordinate = Math.floor(number / 8);
-    board[index] = [xCoordinate, yCoordinate];
-    return board[index];
-  });
+  board = board.map((number) => getTileFromNumber(number));
   const moves = [];
 
   for (let i = 0; i < board.length; i++) {
@@ -65,63 +56,65 @@ function createGraph() {
 const graph = createGraph();
 
 function knightMoves(origin, destination) {
-  function getTileNumber(tile) {
-    return tile[0] + tile[1] * 8;
-  }
-
+  origin = getNumberFromTile(origin);
+  destination = getNumberFromTile(destination);
   if (origin === destination) {
     return null;
   }
 
-  const shortestPath = [];
+  let shortestPath = [];
   const queue = [origin];
-  const visited = [getTileNumber(origin)];
+  const visited = [origin];
   const paths = [];
 
-  function checkShortest(start, end, predecessor) {
+  function checkShortest(start, end) {
     const currentNode = queue.shift();
 
     // Check if destination
     if (currentNode === end) {
-      const finalNode = { predecessor, tile: end };
-      paths.push(finalNode);
+      const finalNode = paths.find((path) => path.tile === currentNode);
       // Reconstruct and return path
       let node = finalNode;
-      while (node.predecessor) {
+      while (node) {
         shortestPath.unshift(node.tile);
-        node = node.predecessor;
+        node = paths.find((path) => path.tile === node.predecessor);
       }
       return shortestPath;
     }
 
-    const tileIndex = getTileNumber(currentNode);
-    const possibleMoves = graph[tileIndex];
+    const possibleMoves = graph[currentNode];
 
     // Check possible moves
     for (let i = 0; i < possibleMoves.length; i++) {
-      if (!visited.includes(getTileNumber(possibleMoves[i]))) {
-        visited.push(getTileNumber(possibleMoves[i]));
+      if (!visited.includes(getNumberFromTile(possibleMoves[i]))) {
+        visited.push(getNumberFromTile(possibleMoves[i]));
       } else {
         continue;
       }
-      queue.push(possibleMoves[i]);
-      paths.push({ predecessor, tile: possibleMoves[i] });
+      queue.push(getNumberFromTile(possibleMoves[i]));
+      paths.push({
+        predecessor: currentNode,
+        tile: getNumberFromTile(possibleMoves[i]),
+      });
     }
 
-    checkShortest(start, end, currentNode);
+    checkShortest(start, end);
+
     return shortestPath;
   }
 
   checkShortest(origin, destination);
 
-  return `The shortest path takes ${shortestPath.length} move(s): ${shortestPath
-    .map((move) => `[${move.join(', ')}]`)
-    .join(', ')}`;
+  shortestPath = shortestPath.map((number) => getTileFromNumber(number));
+
+  return `The shortest path from [${getTileFromNumber(
+    origin
+  )}] to [${getTileFromNumber(destination)}] takes ${
+    shortestPath.length
+  } move(s): ${shortestPath.map((move) => `[${move.join(', ')}]`).join(', ')}`;
 }
 
 const start = [3, 3];
 const end = [5, 7];
 
-const solution = knightMoves(start, end); // Should output [[3,3], [4,5]]
-
-console.log(solution);
+const solution = knightMoves(start, end);
