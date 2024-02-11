@@ -54,33 +54,74 @@ function createGraph() {
     board[index] = [xCoordinate, yCoordinate];
     return board[index];
   });
-  const graph = [];
+  const moves = [];
 
   for (let i = 0; i < board.length; i++) {
-    const vertex = {};
-    vertex.tile = board[i];
-    vertex.moves = getPossibleMovesFrom(board[i]);
-    graph.push(vertex);
+    moves.push(getPossibleMovesFrom(board[i]));
   }
 
-  return graph;
+  return moves;
 }
+const graph = createGraph();
 
 function knightMoves(origin, destination) {
-  const output = [origin];
-  const checkedMoves = [];
-
-  function checkShortest(start, end) {
-    
+  function getTileNumber(tile) {
+    return tile[0] + tile[1] * 8;
   }
 
-  output.push(destination);
-  return output;
+  if (origin === destination) {
+    return null;
+  }
+
+  const shortestPath = [];
+  const queue = [origin];
+  const visited = [getTileNumber(origin)];
+  const paths = [];
+
+  function checkShortest(start, end, predecessor) {
+    const currentNode = queue.shift();
+
+    // Check if destination
+    if (currentNode === end) {
+      const finalNode = { predecessor, tile: end };
+      paths.push(finalNode);
+      // Reconstruct and return path
+      let node = finalNode;
+      while (node.predecessor) {
+        shortestPath.unshift(node.tile);
+        node = node.predecessor;
+      }
+      return shortestPath;
+    }
+
+    const tileIndex = getTileNumber(currentNode);
+    const possibleMoves = graph[tileIndex];
+
+    // Check possible moves
+    for (let i = 0; i < possibleMoves.length; i++) {
+      if (!visited.includes(getTileNumber(possibleMoves[i]))) {
+        visited.push(getTileNumber(possibleMoves[i]));
+      } else {
+        continue;
+      }
+      queue.push(possibleMoves[i]);
+      paths.push({ predecessor, tile: possibleMoves[i] });
+    }
+
+    checkShortest(start, end, currentNode);
+    return shortestPath;
+  }
+
+  checkShortest(origin, destination);
+
+  return `The shortest path takes ${shortestPath.length} move(s): ${shortestPath
+    .map((move) => `[${move.join(', ')}]`)
+    .join(', ')}`;
 }
 
 const start = [3, 3];
-const end = [3, 4];
+const end = [5, 7];
 
-const graph = createGraph();
+const solution = knightMoves(start, end); // Should output [[3,3], [4,5]]
 
-const shortestPath = knightMoves(start, end);
+console.log(solution);
