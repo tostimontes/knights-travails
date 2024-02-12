@@ -167,9 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function animateKnightMovement(path) {
     let currentStep = 0;
-    let totalX = 0; // Total translation in X
-    let totalY = 0; // Total translation in Y
-    const transitionDuration = 1500; // Duration in milliseconds
+    let totalX = 0;
+    let totalY = 0;
+    const transitionDuration = 1500;s
 
     const interval = setInterval(() => {
       const knightElement = document.querySelector('.knight-svg');
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Apply the accumulated translation
         knightElement.style.transform = `translate(calc(${totalX}px - 50%), calc(${totalY}px - 50%)) scale(1.5)`;
 
-        // Halfway through the transition, scale back down
+        
         setTimeout(() => {
           knightElement.style.transform = `translate(calc(${totalX}px - 50%), calc(${totalY}px - 50%)) scale(1)`;
         }, transitionDuration / 2);
@@ -204,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (currentStep < path.length) {
-        // Mark the step number on the previous tile
         if (currentStep > 1) {
           const stepMarker = document.createElement('span');
           stepMarker.textContent = currentStep - 1;
@@ -212,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
           stepMarker.style.left = '50%';
           stepMarker.style.top = '50%';
           stepMarker.style.transform = 'translate(-50%, -50%)';
-          stepMarker.style.fontSize = '20px'; // Adjust as needed
+          stepMarker.style.fontSize = '20px';
           document
             .querySelector(`.${path[currentStep - 1]}`)
             .appendChild(stepMarker);
@@ -223,28 +222,23 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         clearInterval(interval);
       }
-    }, transitionDuration); // Adjust delay as needed
+    }, transitionDuration);
   }
 
   function displayPathMessage(path) {
-    // Get the origin and destination with fixed values
     const origin = path[0].toUpperCase();
     const destination = chessPath[chessPath.length - 1].toUpperCase();
 
-    // Clear the message element and set the initial part of the message
     messageElement.innerHTML = `The shortest path from ${origin} to ${destination} is: `;
 
-    // Add formatted steps, starting from the second element
     path.slice(1).forEach((step, index) => {
       const stepElement = document.createElement('span');
       stepElement.textContent = ` > (${index + 1}) ${step.toUpperCase()}`;
       stepElement.style.opacity = 0;
       stepElement.style.transition = 'opacity 0.5s ease';
 
-      // Append step to message
       messageElement.appendChild(stepElement);
 
-      // Animate opacity
       setTimeout(() => {
         stepElement.style.opacity = 1;
       }, 100 * index);
@@ -252,7 +246,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function resetBoard() {
-    // Clear all tiles
     tiles.forEach((tile) => {
       tile.innerHTML = '';
       tile.classList.remove(
@@ -262,7 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
       );
     });
     isPathInProgress = false;
-    // Reset the state of the game
     isFirstClick = true;
     const messageElement = document.getElementById('message');
     messageElement.textContent = 'Please choose an origin and destination';
