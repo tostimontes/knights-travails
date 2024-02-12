@@ -125,18 +125,26 @@ document.addEventListener('DOMContentLoaded', function () {
   let originTile;
   let destinationTile;
   let chessPath;
+  let isPathInProgress = false;
   const messageElement = document.getElementById('message');
 
   const knightSvg = `<svg class="knight-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M96 48L82.7 61.3C70.7 73.3 64 89.5 64 106.5V238.9c0 10.7 5.3 20.7 14.2 26.6l10.6 7c14.3 9.6 32.7 10.7 48.1 3l3.2-1.6c2.6-1.3 5-2.8 7.3-4.5l49.4-37c6.6-5 15.7-5 22.3 0c10.2 7.7 9.9 23.1-.7 30.3L90.4 350C73.9 361.3 64 380 64 400H384l28.9-159c2.1-11.3 3.1-22.8 3.1-34.3V192C416 86 330 0 224 0H83.8C72.9 0 64 8.9 64 19.8c0 7.5 4.2 14.3 10.9 17.7L96 48zm24 68a20 20 0 1 1 40 0 20 20 0 1 1 -40 0zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H409.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L384 432H64L22.6 473.4z"/></svg>`;
 
   tiles.forEach((tile) => {
     tile.addEventListener('click', function () {
+      if (!isFirstClick && !isPathInProgress) {
+        // Ignore the click
+        return;
+      }
+
       if (isFirstClick) {
         this.innerHTML = knightSvg;
         originTile = this.classList[1]; // Assuming second class is the tile's position (e.g., 'a1')
         isFirstClick = false;
+        isPathInProgress = true;
         this.classList.add('red-highlight-animation'); // Highlight origin
-      } else {
+      } else if (!isFirstClick && isPathInProgress) {
+        isPathInProgress = false;
         destinationTile = this.classList[1];
         this.classList.add('green-highlight-animation'); // Highlight origin
         const path = knightMoves(
@@ -153,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentStep = 0;
     let totalX = 0; // Total translation in X
     let totalY = 0; // Total translation in Y
+    const transitionDuration = 1500; // Duration in milliseconds
 
     const interval = setInterval(() => {
       const knightElement = document.querySelector('.knight-svg');
@@ -171,12 +180,12 @@ document.addEventListener('DOMContentLoaded', function () {
         totalY += newY;
 
         // Apply the accumulated translation
-        knightElement.style.transform = `translate(${totalX}px, ${totalY}px) scale(1.5)`;
+        knightElement.style.transform = `translate(calc(${totalX}px - 50%), calc(${totalY}px - 50%)) scale(1.5)`;
 
-        // Reset the scale once the knight reaches the tile
+        // Halfway through the transition, scale back down
         setTimeout(() => {
-          knightElement.style.transform = `translate(${totalX}px, ${totalY}px) scale(1)`;
-        }, 1500); // This delay should match the interval delay
+          knightElement.style.transform = `translate(calc(${totalX}px - 50%), calc(${totalY}px - 50%)) scale(1)`;
+        }, transitionDuration / 2);
 
         // Highlight previous tile in yellow
         if (currentStep > 1) {
@@ -187,12 +196,26 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (currentStep < path.length) {
+        // Mark the step number on the previous tile
+        if (currentStep > 1) {
+          const stepMarker = document.createElement('span');
+          stepMarker.textContent = currentStep - 1;
+          stepMarker.style.position = 'absolute';
+          stepMarker.style.left = '50%';
+          stepMarker.style.top = '50%';
+          stepMarker.style.transform = 'translate(-50%, -50%)';
+          stepMarker.style.fontSize = '20px'; // Adjust as needed
+          document
+            .querySelector(`.${path[currentStep - 1]}`)
+            .appendChild(stepMarker);
+        }
+
         displayPathMessage(path.slice(0, currentStep + 1));
         currentStep++;
       } else {
         clearInterval(interval);
       }
-    }, 1500); // Adjust delay as needed
+    }, transitionDuration); // Adjust delay as needed
   }
 
   function displayPathMessage(path) {
@@ -201,6 +224,23 @@ document.addEventListener('DOMContentLoaded', function () {
     } is: ${path.join(' -> ')}`;
     messageElement.textContent = message;
   }
+
+  function resetBoard() {
+    // Clear all tiles
+    tiles.forEach((tile) => {
+      tile.innerHTML = ''; // Clear knight and step numbers
+      tile.classList.remove(
+        'red-highlight-animation',
+        'yellow-highlight-animation',
+        'green-highlight-animation'
+      ); // Remove any highlights
+    });
+    isPathInProgress = false;
+    // Reset the state of the game
+    isFirstClick = true;
+  }
+  const resetButton = document.getElementById('resetButton');
+  resetButton.addEventListener('click', resetBoard);
 });
 
 function originToIndex(tile) {
