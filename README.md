@@ -28,6 +28,8 @@ The UI, an addition to the assignment, provides an interactive chessboard where 
 2. **Animation and Path Display**: Upon setting the destination, the knight's figure moves across the board, showing the shortest path. The path is also displayed as text below the chessboard, updating with each move.
 3. **Resetting the Board**: The reset button clears the board and allows users to start a new pathfinding sequence.
 
+Feel free to play with it at: [Knight Travails interactive version](https://tostimontes.github.io/knights-travails/)
+
 ![Example usage](./example-usage.gif)
 
 ### Possible Improvements
