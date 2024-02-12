@@ -1,5 +1,4 @@
-// * Extra credit: create UI representation with animated horse, so that anyone can click in two tiles to know the shortest path
-
+// Shortest path search logic
 function isNotOutOFBounds(tile) {
   if (tile[0] < 0 || tile[0] > 7 || tile[1] < 0 || tile[1] > 7) {
     return false;
@@ -41,6 +40,18 @@ function getNumberFromTile(tile) {
 }
 function getTileFromNumber(number) {
   return [number % 8, Math.floor(number / 8)];
+}
+function originToIndex(tile) {
+  const file = tile.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0);
+  const rank = Math.abs(1 - parseInt(tile[1], 10));
+  return [rank, file];
+}
+
+const files = 'abcdefgh';
+function indexToChessNotation(index) {
+  const file = files.charAt(index[1]);
+  const rank = index[0] + 1;
+  return `${file}${rank}`;
 }
 
 getNumberFromTile([7, 0]);
@@ -110,14 +121,10 @@ function knightMoves(origin, destination) {
   shortestPath = shortestPath.map((number) => getTileFromNumber(number));
   shortestPath.unshift(getTileFromNumber(origin));
 
-  // const consoleMessage = `The shortest path from [${getTileFromNumber(
-  //   origin
-  // )}] to [${getTileFromNumber(destination)}] takes ${
-  //   shortestPath.length
-  // } move(s): ${shortestPath.map((move) => `[${move.join(', ')}]`).join(', ')}`;
-
   return shortestPath;
 }
+
+// UI Representation
 
 document.addEventListener('DOMContentLoaded', function () {
   const tiles = document.querySelectorAll('.tile');
@@ -127,26 +134,27 @@ document.addEventListener('DOMContentLoaded', function () {
   let chessPath;
   let isPathInProgress = false;
   const messageElement = document.getElementById('message');
+  messageElement.textContent = 'Please choose an origin and destination';
+  messageElement.style.opacity = 1;
 
   const knightSvg = `<svg class="knight-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M96 48L82.7 61.3C70.7 73.3 64 89.5 64 106.5V238.9c0 10.7 5.3 20.7 14.2 26.6l10.6 7c14.3 9.6 32.7 10.7 48.1 3l3.2-1.6c2.6-1.3 5-2.8 7.3-4.5l49.4-37c6.6-5 15.7-5 22.3 0c10.2 7.7 9.9 23.1-.7 30.3L90.4 350C73.9 361.3 64 380 64 400H384l28.9-159c2.1-11.3 3.1-22.8 3.1-34.3V192C416 86 330 0 224 0H83.8C72.9 0 64 8.9 64 19.8c0 7.5 4.2 14.3 10.9 17.7L96 48zm24 68a20 20 0 1 1 40 0 20 20 0 1 1 -40 0zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H409.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L384 432H64L22.6 473.4z"/></svg>`;
 
   tiles.forEach((tile) => {
     tile.addEventListener('click', function () {
       if (!isFirstClick && !isPathInProgress) {
-        // Ignore the click
         return;
       }
 
       if (isFirstClick) {
         this.innerHTML = knightSvg;
-        originTile = this.classList[1]; // Assuming second class is the tile's position (e.g., 'a1')
+        originTile = this.classList[1];
         isFirstClick = false;
         isPathInProgress = true;
-        this.classList.add('red-highlight-animation'); // Highlight origin
+        this.classList.add('red-highlight-animation');
       } else if (!isFirstClick && isPathInProgress) {
         isPathInProgress = false;
         destinationTile = this.classList[1];
-        this.classList.add('green-highlight-animation'); // Highlight origin
+        this.classList.add('green-highlight-animation');
         const path = knightMoves(
           originToIndex(originTile),
           originToIndex(destinationTile)
@@ -219,39 +227,46 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function displayPathMessage(path) {
-    const message = `The shortest path from ${path[0]} to ${
-      chessPath[chessPath.length - 1]
-    } is: ${path.join(' -> ')}`;
-    messageElement.textContent = message;
+    // Get the origin and destination with fixed values
+    const origin = path[0].toUpperCase();
+    const destination = chessPath[chessPath.length - 1].toUpperCase();
+
+    // Clear the message element and set the initial part of the message
+    messageElement.innerHTML = `The shortest path from ${origin} to ${destination} is: `;
+
+    // Add formatted steps, starting from the second element
+    path.slice(1).forEach((step, index) => {
+      const stepElement = document.createElement('span');
+      stepElement.textContent = ` > (${index + 1}) ${step.toUpperCase()}`;
+      stepElement.style.opacity = 0;
+      stepElement.style.transition = 'opacity 0.5s ease';
+
+      // Append step to message
+      messageElement.appendChild(stepElement);
+
+      // Animate opacity
+      setTimeout(() => {
+        stepElement.style.opacity = 1;
+      }, 100 * index);
+    });
   }
 
   function resetBoard() {
     // Clear all tiles
     tiles.forEach((tile) => {
-      tile.innerHTML = ''; // Clear knight and step numbers
+      tile.innerHTML = '';
       tile.classList.remove(
         'red-highlight-animation',
         'yellow-highlight-animation',
         'green-highlight-animation'
-      ); // Remove any highlights
+      );
     });
     isPathInProgress = false;
     // Reset the state of the game
     isFirstClick = true;
+    const messageElement = document.getElementById('message');
+    messageElement.textContent = 'Please choose an origin and destination';
   }
   const resetButton = document.getElementById('resetButton');
   resetButton.addEventListener('click', resetBoard);
 });
-
-function originToIndex(tile) {
-  const file = tile.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = Math.abs(1 - parseInt(tile[1], 10));
-  return [rank, file];
-}
-
-const files = 'abcdefgh';
-function indexToChessNotation(index) {
-  const file = files.charAt(index[1]);
-  const rank = index[0] + 1;
-  return `${file}${rank}`;
-}

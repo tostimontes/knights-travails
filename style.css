@@ -6,41 +6,82 @@
 
 :root {
   font-size: 62.5%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* html {
-    width: 100%;
-    height: 100vh;
-} */
-
 body {
+  height: 100vh;
   font-size: 1.6rem;
-  /* width: 100%;
-    height: 100%; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  background: linear-gradient(135deg, #f6d8ac 25%, #dcedc1 50%, #fffbc4 75%);
+  color: #333;
+}
+
+h1 {
+  margin-top: 2rem;
+
+  font-size: 5rem;
+  color: #5a3e36;
+  text-shadow:
+    1px 1px 2px #fff,
+    -1px -1px 1px #000;
 }
 
 #chessboard {
   display: grid;
-  grid-template-columns: 30px repeat(8, 1fr); /* 1 column for row labels + 8 columns for tiles */
-  grid-template-rows: 30px repeat(8, 1fr); /* 1 row for column labels + 8 rows for tiles */
+  grid-template-columns: 30px repeat(8, 1fr);
+  grid-template-rows: 30px repeat(8, 1fr);
   gap: 0;
-  width: 500px; /* or any size you prefer */
-  height: 500px; /* should be same as width for square tiles */
+  width: 500px;
+  height: 500px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+#message {
+  font-size: 2rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#resetButton {
+  padding: 1rem 2rem;
+  background-color: #dcedc1;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+#resetButton:hover {
+  background-color: #c5e1a5;
+  box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.3);
+}
+
+#resetButton:active {
+  background-color: #aed581;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .labels {
-  display: contents; /* To align labels with the grid */
+  display: contents;
 }
 
 .label {
-  font-size: 20px; /* Adjust label size as needed */
+  font-size: 2.2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .row {
-  display: contents; /* To align tiles with the grid */
+  display: contents;
 }
 
 .tile {
@@ -54,15 +95,15 @@ body {
 }
 
 .knight-svg {
-  width: calc(100% - 1rem); /* Assuming padding is 0.25rem on each side */
+  width: calc(100% - 1rem);
   height: calc(100% - 1rem);
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center the SVG */
+  transform: translate(-50%, -50%);
   z-index: 3;
-  transition: all 1s ease; /* Smooth transition for movement and scaling */
-  transform-origin: center; /* Ensures scaling happens centrally */
+  transition: all 1s ease;
+  transform-origin: center;
 }
 
 @keyframes green-highlight {
@@ -107,13 +148,12 @@ body {
   animation: red-highlight 1s infinite;
 }
 
-/* Using wood-like colors for the tiles */
 .row:nth-child(odd) .tile:nth-child(odd),
 .row:nth-child(even) .tile:nth-child(even) {
-  background-color: #deb887; /* Lighter wood tone */
+  background-color: #deb887;
 }
 
 .row:nth-child(odd) .tile:nth-child(even),
 .row:nth-child(even) .tile:nth-child(odd) {
-  background-color: #a0522d; /* Darker wood tone */
+  background-color: #a0522d;
 }
