@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentStep = 0;
     let totalX = 0;
     let totalY = 0;
-    const transitionDuration = 1500;s
+    const transitionDuration = 1500;
 
     const interval = setInterval(() => {
       const knightElement = document.querySelector('.knight-svg');
